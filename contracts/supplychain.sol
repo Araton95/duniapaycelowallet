@@ -1,7 +1,9 @@
 pragma solidity >=0.5.0 <0.7.0;
 
+// We use this contract for product listing and to implement a function to buy the listed products
+// In our use case products can be bitcoins for example (we offer the ability to buy bitcoin isinde the Dunia Pay wallet)
 
-contract SupplyChain {
+contract Product {
     /* set owner */
     address owner;
 
