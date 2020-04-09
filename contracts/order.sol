@@ -1,5 +1,6 @@
 pragma solidity >=0.5.0 <0.7.0;
 
+//we use this contract to sell bitcoins in the Dunia Pay wallet (or products in general)
 
 contract Order {
     //event
@@ -166,7 +167,7 @@ contract Order {
     /// cancel order
     /// cancel order ends
 
-    /// iot container report
+    /// iot container report = Order status 
     function containerReport(address _uniqueId, string memory _transitStatus)
         public
         returns (string memory)
@@ -183,7 +184,7 @@ contract Order {
         return packages[_uniqueId].transitStatus;
     }
 
-    /// iot container report end
+    /// iot container report end = order status 
     function completeTx(address _orderId) public onlyOwner returns (bool) {
         if (packages[_orderId].orderStatus == 3) {
             withdraw(msg.sender);
