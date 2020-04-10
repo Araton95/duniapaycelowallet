@@ -26,8 +26,8 @@ describe("Test Wallet Factory", function () {
     let guardian = accounts[4].signer;
     let other = accounts[6].signer;
 
-    let root = "xyz";
-    let subnameWallet = "argent";
+    let root = "me";
+    let subnameWallet = "dunipay";
     let walletNode = ethers.utils.namehash(subnameWallet + '.' + root);
 
     let index = 0;
@@ -91,7 +91,7 @@ describe("Test Wallet Factory", function () {
         module2 = await deployer.deploy(Module, {}, moduleRegistry.contractAddress, guardianStorage.contractAddress, ZERO_BYTES32);
         await moduleRegistry.registerModule(module1.contractAddress, ethers.utils.formatBytes32String("module1"));
         await moduleRegistry.registerModule(module2.contractAddress, ethers.utils.formatBytes32String("module2"));
-        
+
         index++;
     });
 
@@ -129,11 +129,11 @@ describe("Test Wallet Factory", function () {
         });
 
         it("should not allow guardian storage address to be set to zero", async () => {
-            await assert.revertWith(factory.changeGuardianStorage(ethers.constants.AddressZero), "WF: address cannot be null");          
+            await assert.revertWith(factory.changeGuardianStorage(ethers.constants.AddressZero), "WF: address cannot be null");
         });
     });
 
-    describe("Create wallets with CREATE", () => { 
+    describe("Create wallets with CREATE", () => {
 
         it("should create with the correct owner", async () => {
             // we create the wallet
@@ -164,7 +164,7 @@ describe("Test Wallet Factory", function () {
         });
 
         it("should create with the correct ENS name", async () => {
-            let label = "wallet" + index; 
+            let label = "wallet" + index;
             let labelNode = ethers.utils.namehash(label + '.' + subnameWallet + "." + root);
             let modules = [module1.contractAddress, module2.contractAddress];
             // we create the wallet
@@ -179,7 +179,7 @@ describe("Test Wallet Factory", function () {
         });
 
         it("should fail to create when there is no modules", async () => {
-            let label = "wallet" + index; 
+            let label = "wallet" + index;
             let modules = [];
             await assert.revertWith(factory.from(deployer).createWallet(owner.address, modules, label), "WF: cannot assign with less than 1 module");
         });
@@ -199,26 +199,26 @@ describe("Test Wallet Factory", function () {
         it("should fail to create with zero address as owner", async () => {
             let label = "wallet" + index;
             let modules = [module1.contractAddress];
-            await assert.revertWith(factory.from(infrastructure).createWallet(ethers.constants.AddressZero, modules, label), "WF: owner cannot be null");     
+            await assert.revertWith(factory.from(infrastructure).createWallet(ethers.constants.AddressZero, modules, label), "WF: owner cannot be null");
         });
 
         it("should fail to create with no modules", async () => {
             let label = "wallet" + index;
             let modules = [];
-            await assert.revertWith(factory.from(infrastructure).createWallet(owner.address, modules, label), "WF: cannot assign with less than 1 module");     
+            await assert.revertWith(factory.from(infrastructure).createWallet(owner.address, modules, label), "WF: cannot assign with less than 1 module");
         });
 
         it("should fail to create with unregistered module", async () => {
             let label = "wallet" + index;
             const randomAddress = utilities.getRandomAddress();
             let modules = [randomAddress];
-            await assert.revertWith(factory.from(infrastructure).createWallet(owner.address, modules, label), "WF: one or more modules are not registered");     
+            await assert.revertWith(factory.from(infrastructure).createWallet(owner.address, modules, label), "WF: one or more modules are not registered");
         });
 
         it("should fail to create with empty label", async () => {
             let label = "";
             let modules = [module1.contractAddress];
-            await assert.revertWith(factory.from(infrastructure).createWallet(owner.address, modules, label), "WF: ENS lable must be defined");     
+            await assert.revertWith(factory.from(infrastructure).createWallet(owner.address, modules, label), "WF: ENS lable must be defined");
         });
     });
 
@@ -238,7 +238,7 @@ describe("Test Wallet Factory", function () {
         });
 
         it("should create with the correct modules", async () => {
-            let label = "wallet" + index; 
+            let label = "wallet" + index;
             let modules = [module1.contractAddress, module2.contractAddress];
             // we create the wallet
             let tx = await factory.from(infrastructure).createWalletWithGuardian(owner.address, modules, label, guardian.address);
@@ -254,7 +254,7 @@ describe("Test Wallet Factory", function () {
 
         it("should create with the correct guardian", async () => {
             // we create the wallet
-            let label = "wallet" + index; 
+            let label = "wallet" + index;
             let modules = [module1.contractAddress];
             let tx = await factory.from(infrastructure).createWalletWithGuardian(owner.address, modules, label, guardian.address);
             let txReceipt = await factory.verboseWaitForTransaction(tx);
@@ -265,7 +265,7 @@ describe("Test Wallet Factory", function () {
         });
 
         it("should create with the correct ENS name", async () => {
-            let label = "wallet" + index; 
+            let label = "wallet" + index;
             let labelNode = ethers.utils.namehash(label + '.' + subnameWallet + "." + root);
             let modules = [module1.contractAddress, module2.contractAddress];
             // we create the wallet
@@ -280,20 +280,20 @@ describe("Test Wallet Factory", function () {
         });
 
         it("should fail to create with a guardian when the guardian storage is not defined", async () => {
-            let label = "wallet" + index; 
+            let label = "wallet" + index;
             let modules = [module1.contractAddress, module2.contractAddress];
             await assert.revertWith(factoryWithoutGuardianStorage.from(infrastructure).createWalletWithGuardian(owner.address, modules, label, guardian.address), "GuardianStorage address not defined");
         });
 
         it("should fail to create when the guardian is empty", async () => {
             // we create the wallet
-            let label = "wallet" + index; 
+            let label = "wallet" + index;
             let modules = [module1.contractAddress];
             await assert.revertWith(factory.from(infrastructure).createWalletWithGuardian(owner.address, modules, label, ZERO_ADDRESS), "WF: guardian cannot be null");
         });
     });
 
-    describe("Create wallets with CREATE2", () => { 
+    describe("Create wallets with CREATE2", () => {
 
         let module1, module2;
 
@@ -305,22 +305,22 @@ describe("Test Wallet Factory", function () {
         });
 
         it("should create a wallet at the correct address", async () => {
-            let salt = bigNumberify(randomBytes(32)).toHexString (); 
-            let label = "wallet" + index; 
-            let modules = [module1.contractAddress, module2.contractAddress]; 
+            let salt = bigNumberify(randomBytes(32)).toHexString();
+            let label = "wallet" + index;
+            let modules = [module1.contractAddress, module2.contractAddress];
             // we get the future address
-            let futureAddr = await factory.getAddressForCounterfactualWallet(owner.address, modules, salt); 
+            let futureAddr = await factory.getAddressForCounterfactualWallet(owner.address, modules, salt);
             // we create the wallet
             let tx = await factory.from(infrastructure).createCounterfactualWallet(owner.address, modules, label, salt);
             let txReceipt = await factory.verboseWaitForTransaction(tx);
             let walletAddr = txReceipt.events.filter(event => event.event == 'WalletCreated')[0].args.wallet;
             // we test that the wallet is at the correct address
             assert.equal(futureAddr, walletAddr, 'should have the correct address');
-        }); 
+        });
 
         it("should create with the correct owner", async () => {
-            let salt = bigNumberify(randomBytes(32)).toHexString ();
-            let label = "wallet" + index; 
+            let salt = bigNumberify(randomBytes(32)).toHexString();
+            let label = "wallet" + index;
             let modules = [module1.contractAddress, module2.contractAddress];
             // we get the future address
             let futureAddr = await factory.getAddressForCounterfactualWallet(owner.address, modules, salt);
@@ -337,8 +337,8 @@ describe("Test Wallet Factory", function () {
         });
 
         it("should create with the correct modules", async () => {
-            let salt = bigNumberify(randomBytes(32)).toHexString ();
-            let label = "wallet" + index; 
+            let salt = bigNumberify(randomBytes(32)).toHexString();
+            let label = "wallet" + index;
             let modules = [module1.contractAddress, module2.contractAddress];
             // we get the future address
             let futureAddr = await factory.getAddressForCounterfactualWallet(owner.address, modules, salt);
@@ -357,8 +357,8 @@ describe("Test Wallet Factory", function () {
         });
 
         it("should create with the correct ENS name", async () => {
-            let salt = bigNumberify(randomBytes(32)).toHexString ();
-            let label = "wallet" + index; 
+            let salt = bigNumberify(randomBytes(32)).toHexString();
+            let label = "wallet" + index;
             let labelNode = ethers.utils.namehash(label + '.' + subnameWallet + "." + root);
             let modules = [module1.contractAddress, module2.contractAddress];
             // we get the future address
@@ -377,8 +377,8 @@ describe("Test Wallet Factory", function () {
         });
 
         it("should fail to create a wallet at an existing address", async () => {
-            let salt = bigNumberify(randomBytes(32)).toHexString ();
-            let label = "wallet" + index; 
+            let salt = bigNumberify(randomBytes(32)).toHexString();
+            let label = "wallet" + index;
             let modules = [module1.contractAddress, module2.contractAddress];
             // we get the future address
             let futureAddr = await factory.getAddressForCounterfactualWallet(owner.address, modules, salt);
@@ -393,26 +393,26 @@ describe("Test Wallet Factory", function () {
         });
 
         it("should fail to create when there is no modules", async () => {
-            let salt = bigNumberify(randomBytes(32)).toHexString ();
-            let label = "wallet" + index; 
+            let salt = bigNumberify(randomBytes(32)).toHexString();
+            let label = "wallet" + index;
             let modules = [];
             await assert.revertWith(factory.from(deployer).createCounterfactualWallet(owner.address, modules, label, salt), "WF: cannot assign with less than 1 module");
         });
 
         it("should fail to create when there is no ENS", async () => {
-            let salt = bigNumberify(randomBytes(32)).toHexString ();
-            let label = ""; 
+            let salt = bigNumberify(randomBytes(32)).toHexString();
+            let label = "";
             let modules = [module1.contractAddress, module2.contractAddress];
             await assert.revertWith(factory.from(deployer).createCounterfactualWallet(owner.address, modules, label, salt), "WF: ENS lable must be defined");
         });
 
         it("should emit and event when the balance is non zero at creation", async () => {
-            let salt = bigNumberify(randomBytes(32)).toHexString (); 
-            let label = "wallet" + index; 
-            let modules = [module1.contractAddress, module2.contractAddress]; 
+            let salt = bigNumberify(randomBytes(32)).toHexString();
+            let label = "wallet" + index;
+            let modules = [module1.contractAddress, module2.contractAddress];
             let amount = bigNumberify('10000000000000');
             // we get the future address
-            let futureAddr = await factory.getAddressForCounterfactualWallet(owner.address, modules, salt); 
+            let futureAddr = await factory.getAddressForCounterfactualWallet(owner.address, modules, salt);
             // We send ETH to the address
             await infrastructure.sendTransaction({ to: futureAddr, value: amount });
             // we create the wallet
@@ -420,9 +420,9 @@ describe("Test Wallet Factory", function () {
             let txReceipt = await factory.verboseWaitForTransaction(tx);
             let wallet = deployer.wrapDeployedContract(Wallet, futureAddr);
             assert.isTrue(await utils.hasEvent(txReceipt, wallet, "Received"), "should have generated Received event");
-            let log = await utils.parseLogs(txReceipt, wallet, "Received"); 
+            let log = await utils.parseLogs(txReceipt, wallet, "Received");
             assert.equal(log[0].value.toNumber(), amount, "should log the correct amount");
-            assert.equal(log[0].sender, '0x0000000000000000000000000000000000000000', "sender should be address(0)"); 
+            assert.equal(log[0].sender, '0x0000000000000000000000000000000000000000', "sender should be address(0)");
         });
     });
 
@@ -438,25 +438,25 @@ describe("Test Wallet Factory", function () {
         });
 
         it("should create a wallet at the correct address", async () => {
-            let salt = bigNumberify(randomBytes(32)).toHexString (); 
-            let label = "wallet" + index; 
-            let modules = [module1.contractAddress, module2.contractAddress]; 
+            let salt = bigNumberify(randomBytes(32)).toHexString();
+            let label = "wallet" + index;
+            let modules = [module1.contractAddress, module2.contractAddress];
             // we get the future address
-            let futureAddr = await factory.getAddressForCounterfactualWalletWithGuardian(owner.address, modules, guardian.address, salt); 
+            let futureAddr = await factory.getAddressForCounterfactualWalletWithGuardian(owner.address, modules, guardian.address, salt);
             // we create the wallet
             let tx = await factory.from(infrastructure).createCounterfactualWalletWithGuardian(owner.address, modules, label, guardian.address, salt);
             let txReceipt = await factory.verboseWaitForTransaction(tx);
             let walletAddr = txReceipt.events.filter(event => event.event == 'WalletCreated')[0].args.wallet;
             // we test that the wallet is at the correct address
             assert.equal(futureAddr, walletAddr, 'should have the correct address');
-        }); 
+        });
 
         it("should create with the correct owner", async () => {
-            let salt = bigNumberify(randomBytes(32)).toHexString ();
-            let label = "wallet" + index; 
+            let salt = bigNumberify(randomBytes(32)).toHexString();
+            let label = "wallet" + index;
             let modules = [module1.contractAddress, module2.contractAddress];
             // we get the future address
-            let futureAddr = await factory.getAddressForCounterfactualWalletWithGuardian(owner.address, modules, guardian.address, salt); 
+            let futureAddr = await factory.getAddressForCounterfactualWalletWithGuardian(owner.address, modules, guardian.address, salt);
             // we create the wallet
             let tx = await factory.from(infrastructure).createCounterfactualWalletWithGuardian(owner.address, modules, label, guardian.address, salt);
             let txReceipt = await factory.verboseWaitForTransaction(tx);
@@ -470,11 +470,11 @@ describe("Test Wallet Factory", function () {
         });
 
         it("should create with the correct guardian", async () => {
-            let salt = bigNumberify(randomBytes(32)).toHexString ();
-            let label = "wallet" + index; 
+            let salt = bigNumberify(randomBytes(32)).toHexString();
+            let label = "wallet" + index;
             let modules = [module1.contractAddress, module2.contractAddress];
             // we get the future address
-            let futureAddr = await factory.getAddressForCounterfactualWalletWithGuardian(owner.address, modules, guardian.address, salt); 
+            let futureAddr = await factory.getAddressForCounterfactualWalletWithGuardian(owner.address, modules, guardian.address, salt);
             // we create the wallet
             let tx = await factory.from(infrastructure).createCounterfactualWalletWithGuardian(owner.address, modules, label, guardian.address, salt);
             let txReceipt = await factory.verboseWaitForTransaction(tx);
@@ -487,11 +487,11 @@ describe("Test Wallet Factory", function () {
         });
 
         it("should create with the correct modules", async () => {
-            let salt = bigNumberify(randomBytes(32)).toHexString ();
-            let label = "wallet" + index; 
+            let salt = bigNumberify(randomBytes(32)).toHexString();
+            let label = "wallet" + index;
             let modules = [module1.contractAddress, module2.contractAddress];
             // we get the future address
-            let futureAddr = await factory.getAddressForCounterfactualWalletWithGuardian(owner.address, modules, guardian.address, salt); 
+            let futureAddr = await factory.getAddressForCounterfactualWalletWithGuardian(owner.address, modules, guardian.address, salt);
             // we create the wallet
             let tx = await factory.from(infrastructure).createCounterfactualWalletWithGuardian(owner.address, modules, label, guardian.address, salt);
             let txReceipt = await factory.verboseWaitForTransaction(tx);
@@ -507,12 +507,12 @@ describe("Test Wallet Factory", function () {
         });
 
         it("should create with the correct ENS name", async () => {
-            let salt = bigNumberify(randomBytes(32)).toHexString ();
-            let label = "wallet" + index; 
+            let salt = bigNumberify(randomBytes(32)).toHexString();
+            let label = "wallet" + index;
             let labelNode = ethers.utils.namehash(label + '.' + subnameWallet + "." + root);
             let modules = [module1.contractAddress, module2.contractAddress];
             // we get the future address
-            let futureAddr = await factory.getAddressForCounterfactualWalletWithGuardian(owner.address, modules, guardian.address, salt); 
+            let futureAddr = await factory.getAddressForCounterfactualWalletWithGuardian(owner.address, modules, guardian.address, salt);
             // we create the wallet
             let tx = await factory.from(infrastructure).createCounterfactualWalletWithGuardian(owner.address, modules, label, guardian.address, salt);
             let txReceipt = await factory.verboseWaitForTransaction(tx);
@@ -527,11 +527,11 @@ describe("Test Wallet Factory", function () {
         });
 
         it("should fail to create a wallet at an existing address", async () => {
-            let salt = bigNumberify(randomBytes(32)).toHexString ();
-            let label = "wallet" + index; 
+            let salt = bigNumberify(randomBytes(32)).toHexString();
+            let label = "wallet" + index;
             let modules = [module1.contractAddress, module2.contractAddress];
             // we get the future address
-            let futureAddr = await factory.getAddressForCounterfactualWalletWithGuardian(owner.address, modules, guardian.address, salt); 
+            let futureAddr = await factory.getAddressForCounterfactualWalletWithGuardian(owner.address, modules, guardian.address, salt);
             // we create the first wallet
             let tx = await factory.from(infrastructure).createCounterfactualWalletWithGuardian(owner.address, modules, label, guardian.address, salt);
             let txReceipt = await factory.verboseWaitForTransaction(tx);
@@ -543,8 +543,8 @@ describe("Test Wallet Factory", function () {
         });
 
         it("should fail to create when there is no modules", async () => {
-            let salt = bigNumberify(randomBytes(32)).toHexString ();
-            let label = "wallet" + index; 
+            let salt = bigNumberify(randomBytes(32)).toHexString();
+            let label = "wallet" + index;
             let modules = [];
             await assert.revertWith(factory.from(deployer).createCounterfactualWalletWithGuardian(owner.address, modules, label, guardian.address, salt), "WF: cannot assign with less than 1 module");
         });
@@ -556,22 +556,22 @@ describe("Test Wallet Factory", function () {
 
 
         it("should fail to create with a guardian when the guardian storage is not defined", async () => {
-            let salt = bigNumberify(randomBytes(32)).toHexString ();
-            let label = "wallet" + index; 
+            let salt = bigNumberify(randomBytes(32)).toHexString();
+            let label = "wallet" + index;
             let modules = [module1.contractAddress, module2.contractAddress];
             await assert.revertWith(factoryWithoutGuardianStorage.from(infrastructure).createCounterfactualWalletWithGuardian(owner.address, modules, label, guardian.address, salt), "GuardianStorage address not defined");
         });
 
         it("should fail to get an address when the guardian is empty", async () => {
-            let salt = bigNumberify(randomBytes(32)).toHexString ();
-            let label = "wallet" + index; 
+            let salt = bigNumberify(randomBytes(32)).toHexString();
+            let label = "wallet" + index;
             let modules = [module1.contractAddress, module2.contractAddress];
             await assert.revertWith(factory.from(infrastructure).getAddressForCounterfactualWalletWithGuardian(owner.address, modules, ZERO_ADDRESS, salt), "WF: guardian cannot be null");
         });
 
         it("should fail to create when the guardian is empty", async () => {
-            let salt = bigNumberify(randomBytes(32)).toHexString ();
-            let label = "wallet" + index; 
+            let salt = bigNumberify(randomBytes(32)).toHexString();
+            let label = "wallet" + index;
             let modules = [module1.contractAddress, module2.contractAddress];
             await assert.revertWith(factory.from(infrastructure).createCounterfactualWalletWithGuardian(owner.address, modules, label, ZERO_ADDRESS, salt), "WF: guardian cannot be null");
         });

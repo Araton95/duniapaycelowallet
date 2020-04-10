@@ -59,7 +59,7 @@ const deploy = async (network, secret) => {
 
     const ENSRegistryWrapper = deployer.wrapDeployedContract(ENS, newConfig.ENS.ensRegistry);
 
-    // Get the address of the previous owner of the root wallet ENS (e.g. argent.xyz)
+    // Get the address of the previous owner of the root wallet ENS (e.g. duniapay.me)
     const previousWalletEnsOwner = await ENSRegistryWrapper.contract.owner(utils.namehash(walletRootEns));
 
     if (previousWalletEnsOwner.toLowerCase() === deploymentAccount.toLowerCase()) {

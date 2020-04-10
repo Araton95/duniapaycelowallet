@@ -11,7 +11,7 @@ import "../base/Managed.sol";
 /**
  * @title DuniaENSManager
  * @dev Implementation of an ENS manager that orchestrates the complete
- * registration of subdomains for a single root (e.g. argent.eth).
+ * registration of subdomains for a single root (e.g. duniapay.me).
  * The contract defines a manager role who is the only role that can trigger the registration of
  * a new subdomain.
  */
@@ -34,7 +34,7 @@ contract DuniaENSManager is IENSManager, Owned, Managed {
     /**
      * @dev Constructor that sets the ENS root name and root node to manage.
      * @param _rootName The root name (e.g. argentx.eth).
-     * @param _rootNode The node of the root name (e.g. namehash(argentx.eth)).
+     * @param _rootNode The node of the root name (e.g. namehash(duniapay.me)).
      * @param _ensRegistry The address of the ENS registry
      * @param _ensResolver The address of the ENS resolver
      */

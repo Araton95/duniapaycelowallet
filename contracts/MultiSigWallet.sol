@@ -1,28 +1,12 @@
-// Copyright (C) 2018  Argent Labs Ltd. <https://argent.xyz>
+pragma solidity ^0.6.4;
 
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-
-// You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-pragma solidity ^0.5.4;
 
 /**
  * @title MultiSig
  * @dev Simple MultiSig using off-chain signing.
- * @author Julien Niset - <julien@argent.xyz>
  */
 contract MultiSigWallet {
-
-    uint constant public MAX_OWNER_COUNT = 10;
+    uint256 public constant MAX_OWNER_COUNT = 10;
 
     // Incrementing counter to prevent replay attacks
     uint256 public nonce;
@@ -31,13 +15,17 @@ contract MultiSigWallet {
     // The number of owners
     uint256 public ownersCount;
     // Mapping to check if an address is an owner
-    mapping (address => bool) public isOwner;
+    mapping(address => bool) public isOwner;
 
     // Events
     event OwnerAdded(address indexed owner);
     event OwnerRemoved(address indexed owner);
     event ThresholdChanged(uint256 indexed newThreshold);
-    event Executed(address indexed destination, uint256 indexed value, bytes data);
+    event Executed(
+        address indexed destination,
+        uint256 indexed value,
+        bytes data
+    );
     event Received(uint256 indexed value, address indexed from);
 
     /**
@@ -45,7 +33,10 @@ contract MultiSigWallet {
      * @dev Mainly used for enforcing the use of internal functions through the "execute" function
      */
     modifier onlyWallet() {
-        require(msg.sender == address(this), "MSW: Calling account is not wallet");
+        require(
+            msg.sender == address(this),
+            "MSW: Calling account is not wallet"
+        );
         _;
     }
 
@@ -55,8 +46,14 @@ contract MultiSigWallet {
      * @param _owners The initial set of owners of the multisig.
      */
     constructor(uint256 _threshold, address[] memory _owners) public {
-        require(_owners.length > 0 && _owners.length <= MAX_OWNER_COUNT, "MSW: Not enough or too many owners");
-        require(_threshold > 0 && _threshold <= _owners.length, "MSW: Invalid threshold");
+        require(
+            _owners.length > 0 && _owners.length <= MAX_OWNER_COUNT,
+            "MSW: Not enough or too many owners"
+        );
+        require(
+            _threshold > 0 && _threshold <= _owners.length,
+            "MSW: Invalid threshold"
+        );
         ownersCount = _owners.length;
         threshold = _threshold;
         for (uint256 i = 0; i < _owners.length; i++) {
@@ -74,26 +71,48 @@ contract MultiSigWallet {
      * @param _data The data parameter for the transaction to execute.
      * @param _signatures Concatenated signatures ordered based on increasing signer's address.
      */
-    function execute(address _to, uint _value, bytes memory _data, bytes memory _signatures) public {
+    function execute(
+        address _to,
+        uint256 _value,
+        bytes memory _data,
+        bytes memory _signatures
+    ) public {
         uint8 v;
         bytes32 r;
         bytes32 s;
         uint256 count = _signatures.length / 65;
         require(count >= threshold, "MSW: Not enough signatures");
-        bytes32 txHash = keccak256(abi.encodePacked(byte(0x19), byte(0), address(this), _to, _value, _data, nonce));
+        bytes32 txHash = keccak256(
+            abi.encodePacked(
+                bytes1(0x19),
+                bytes1(0),
+                address(this),
+                _to,
+                _value,
+                _data,
+                nonce
+            )
+        );
         nonce += 1;
         uint256 valid = 0;
         address lastSigner = address(0);
         for (uint256 i = 0; i < count; i++) {
-            (v,r,s) = splitSignature(_signatures, i);
-            address recovered = ecrecover(keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32",txHash)), v, r, s);
+            (v, r, s) = splitSignature(_signatures, i);
+            address recovered = ecrecover(
+                keccak256(
+                    abi.encodePacked("\x19Ethereum Signed Message:\n32", txHash)
+                ),
+                v,
+                r,
+                s
+            );
             require(recovered > lastSigner, "MSW: Badly ordered signatures"); // make sure signers are different
             lastSigner = recovered;
             if (isOwner[recovered]) {
                 valid += 1;
                 if (valid >= threshold) {
                     // solium-disable-next-line security/no-call-value
-                    (bool success,) = _to.call.value(_value)(_data);
+                    (bool success, ) = _to.call.value(_value)(_data);
                     require(success, "MSW: External call failed");
                     emit Executed(_to, _value, _data);
                     return;
@@ -136,7 +155,10 @@ contract MultiSigWallet {
      * @param _newThreshold The new threshold.
      */
     function changeThreshold(uint256 _newThreshold) public onlyWallet {
-        require(_newThreshold > 0 && _newThreshold <= ownersCount, "MSW: Invalid new threshold");
+        require(
+            _newThreshold > 0 && _newThreshold <= ownersCount,
+            "MSW: Invalid new threshold"
+        );
         threshold = _newThreshold;
         emit ThresholdChanged(_newThreshold);
     }
@@ -147,15 +169,22 @@ contract MultiSigWallet {
      * @param _signatures concatenated signatures
      * @param _index which signature to read (0, 1, 2, ...)
      */
-    function splitSignature(bytes memory _signatures, uint256 _index) internal pure returns (uint8 v, bytes32 r, bytes32 s) {
+    function splitSignature(bytes memory _signatures, uint256 _index)
+        internal
+        pure
+        returns (uint8 v, bytes32 r, bytes32 s)
+    {
         // we jump 32 (0x20) as the first slot of bytes contains the length
         // we jump 65 (0x41) per signature
         // for v we load 32 bytes ending with v (the first 31 come from s) tehn apply a mask
         // solium-disable-next-line security/no-inline-assembly
         assembly {
-            r := mload(add(_signatures, add(0x20,mul(0x41,_index))))
-            s := mload(add(_signatures, add(0x40,mul(0x41,_index))))
-            v := and(mload(add(_signatures, add(0x41,mul(0x41,_index)))), 0xff)
+            r := mload(add(_signatures, add(0x20, mul(0x41, _index))))
+            s := mload(add(_signatures, add(0x40, mul(0x41, _index))))
+            v := and(
+                mload(add(_signatures, add(0x41, mul(0x41, _index)))),
+                0xff
+            )
         }
         require(v == 27 || v == 28, "MSW: Invalid v");
     }
@@ -163,8 +192,7 @@ contract MultiSigWallet {
     /**
      * @dev Fallback function to allow the multisig to receive ETH, which will fail if not implemented
      */
-    function () external payable {
+    function() external payable {
         emit Received(msg.value, msg.sender);
     }
-
 }

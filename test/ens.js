@@ -18,8 +18,8 @@ describe("Test ENS contracts", function () {
     let amanager = accounts[2].signer;
     let anonmanager = accounts[3].signer;
 
-    let root = "xyz";
-    let subnameWallet = "argent";
+    let root = "me";
+    let subnameWallet = "duniapay";
     let walletNode = ethers.utils.namehash(subnameWallet + '.' + root);
 
     let ensRegistry, ensResolver, ensReverse, ensManager;
