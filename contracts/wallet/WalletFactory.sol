@@ -1,19 +1,4 @@
-// Copyright (C) 2018  Argent Labs Ltd. <https://argent.xyz>
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-
-// You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-pragma solidity ^0.5.4;
+pragma solidity ^0.6.4;
 import "./Proxy.sol";
 import "./BaseWallet.sol";
 import "../base/Owned.sol";
@@ -22,13 +7,13 @@ import "../ens/IENSManager.sol";
 import "../upgrade/ModuleRegistry.sol";
 import "../storage/IGuardianStorage.sol";
 
+
 /**
  * @title WalletFactory
  * @dev The WalletFactory contract creates and assigns wallets to accounts.
  * @author Julien Niset - <julien@argent.xyz>
  */
 contract WalletFactory is Owned, Managed {
-
     // The address of the module dregistry
     address public moduleRegistry;
     // The address of the base wallet implementation
@@ -43,7 +28,11 @@ contract WalletFactory is Owned, Managed {
     event ModuleRegistryChanged(address addr);
     event ENSManagerChanged(address addr);
     event GuardianStorageChanged(address addr);
-    event WalletCreated(address indexed wallet, address indexed owner, address indexed guardian);
+    event WalletCreated(
+        address indexed wallet,
+        address indexed owner,
+        address indexed guardian
+    );
 
     // *************** Modifiers *************************** //
 
@@ -51,7 +40,10 @@ contract WalletFactory is Owned, Managed {
      * @dev Throws if the guardian storage address is not set.
      */
     modifier guardianStorageDefined {
-        require(guardianStorage != address(0), "GuardianStorage address not defined");
+        require(
+            guardianStorage != address(0),
+            "GuardianStorage address not defined"
+        );
         _;
     }
 
@@ -60,7 +52,11 @@ contract WalletFactory is Owned, Managed {
     /**
      * @dev Default constructor.
      */
-    constructor(address _moduleRegistry, address _walletImplementation, address _ensManager) public {
+    constructor(
+        address _moduleRegistry,
+        address _walletImplementation,
+        address _ensManager
+    ) public {
         moduleRegistry = _moduleRegistry;
         walletImplementation = _walletImplementation;
         ensManager = _ensManager;
@@ -80,10 +76,7 @@ contract WalletFactory is Owned, Managed {
         address _owner,
         address[] calldata _modules,
         string calldata _label
-    )
-        external
-        onlyManager
-    {
+    ) external onlyManager {
         _createWallet(_owner, _modules, _label, address(0));
     }
 
@@ -101,11 +94,7 @@ contract WalletFactory is Owned, Managed {
         address[] calldata _modules,
         string calldata _label,
         address _guardian
-    )
-        external
-        onlyManager
-        guardianStorageDefined
-    {
+    ) external onlyManager guardianStorageDefined {
         require(_guardian != (address(0)), "WF: guardian cannot be null");
         _createWallet(_owner, _modules, _label, _guardian);
     }
@@ -124,11 +113,14 @@ contract WalletFactory is Owned, Managed {
         address[] calldata _modules,
         string calldata _label,
         bytes32 _salt
-    )
-        external
-        onlyManager
-    {
-        _createCounterfactualWallet(_owner, _modules, _label, address(0), _salt);
+    ) external onlyManager {
+        _createCounterfactualWallet(
+            _owner,
+            _modules,
+            _label,
+            address(0),
+            _salt
+        );
     }
 
     /**
@@ -147,11 +139,7 @@ contract WalletFactory is Owned, Managed {
         string calldata _label,
         address _guardian,
         bytes32 _salt
-    )
-        external
-        onlyManager
-        guardianStorageDefined
-    {
+    ) external onlyManager guardianStorageDefined {
         require(_guardian != (address(0)), "WF: guardian cannot be null");
         _createCounterfactualWallet(_owner, _modules, _label, _guardian, _salt);
     }
@@ -167,12 +155,13 @@ contract WalletFactory is Owned, Managed {
         address _owner,
         address[] calldata _modules,
         bytes32 _salt
-    )
-        external
-        view
-        returns (address _wallet)
-    {
-        _wallet = _getAddressForCounterfactualWallet(_owner, _modules, address(0), _salt);
+    ) external view returns (address _wallet) {
+        _wallet = _getAddressForCounterfactualWallet(
+            _owner,
+            _modules,
+            address(0),
+            _salt
+        );
     }
 
     /**
@@ -188,13 +177,14 @@ contract WalletFactory is Owned, Managed {
         address[] calldata _modules,
         address _guardian,
         bytes32 _salt
-    )
-        external
-        view
-        returns (address _wallet)
-    {
+    ) external view returns (address _wallet) {
         require(_guardian != (address(0)), "WF: guardian cannot be null");
-        _wallet = _getAddressForCounterfactualWallet(_owner, _modules, _guardian, _salt);
+        _wallet = _getAddressForCounterfactualWallet(
+            _owner,
+            _modules,
+            _guardian,
+            _salt
+        );
     }
 
     /**
@@ -221,7 +211,10 @@ contract WalletFactory is Owned, Managed {
      * @dev Lets the owner change the address of the GuardianStorage contract.
      * @param _guardianStorage The address of the GuardianStorage contract.
      */
-    function changeGuardianStorage(address _guardianStorage) external onlyOwner {
+    function changeGuardianStorage(address _guardianStorage)
+        external
+        onlyOwner
+    {
         require(_guardianStorage != address(0), "WF: address cannot be null");
         guardianStorage = _guardianStorage;
         emit GuardianStorageChanged(_guardianStorage);
@@ -232,7 +225,8 @@ contract WalletFactory is Owned, Managed {
      * The method can only be called by the wallet itself.
      * @param _wallet The wallet.
      */
-    function init(BaseWallet _wallet) external pure { // solium-disable-line no-empty-blocks
+    function init(BaseWallet _wallet) external pure {
+        // solium-disable-line no-empty-blocks
         //do nothing
     }
 
@@ -247,11 +241,22 @@ contract WalletFactory is Owned, Managed {
      * @param _label ENS label of the new wallet, e.g. franck.
      * @param _guardian (Optional) The guardian address.
      */
-    function _createWallet(address _owner, address[] memory _modules, string memory _label, address _guardian) internal {
+    function _createWallet(
+        address _owner,
+        address[] memory _modules,
+        string memory _label,
+        address _guardian
+    ) internal {
         _validateInputs(_owner, _modules, _label);
         Proxy proxy = new Proxy(walletImplementation);
         address payable wallet = address(proxy);
-        _configureWallet(BaseWallet(wallet), _owner, _modules, _label, _guardian);
+        _configureWallet(
+            BaseWallet(wallet),
+            _owner,
+            _modules,
+            _label,
+            _guardian
+        );
     }
 
     /**
@@ -270,19 +275,28 @@ contract WalletFactory is Owned, Managed {
         string memory _label,
         address _guardian,
         bytes32 _salt
-    )
-        internal
-    {
+    ) internal {
         _validateInputs(_owner, _modules, _label);
         bytes32 newsalt = _newSalt(_salt, _owner, _modules, _guardian);
-        bytes memory code = abi.encodePacked(type(Proxy).creationCode, uint256(walletImplementation));
+        bytes memory code = abi.encodePacked(
+            type(Proxy).creationCode,
+            uint256(walletImplementation)
+        );
         address payable wallet;
         // solium-disable-next-line security/no-inline-assembly
         assembly {
             wallet := create2(0, add(code, 0x20), mload(code), newsalt)
-            if iszero(extcodesize(wallet)) { revert(0, returndatasize) }
+            if iszero(extcodesize(wallet)) {
+                revert(0, returndatasize())
+            }
         }
-        _configureWallet(BaseWallet(wallet), _owner, _modules, _label, _guardian);
+        _configureWallet(
+            BaseWallet(wallet),
+            _owner,
+            _modules,
+            _label,
+            _guardian
+        );
     }
 
     /**
@@ -299,13 +313,11 @@ contract WalletFactory is Owned, Managed {
         address[] memory _modules,
         string memory _label,
         address _guardian
-    )
-        internal
-    {
+    ) internal {
         // add the factory to modules so it can claim the reverse ENS or add a guardian
         address[] memory extendedModules = new address[](_modules.length + 1);
         extendedModules[0] = address(this);
-        for (uint i = 0; i < _modules.length; i++) {
+        for (uint256 i = 0; i < _modules.length; i++) {
             extendedModules[i + 1] = _modules[i];
         }
         // initialise the wallet with the owner and the extended modules
@@ -335,14 +347,20 @@ contract WalletFactory is Owned, Managed {
         address[] memory _modules,
         address _guardian,
         bytes32 _salt
-    )
-        internal
-        view
-        returns (address _wallet)
-    {
+    ) internal view returns (address _wallet) {
         bytes32 newsalt = _newSalt(_salt, _owner, _modules, _guardian);
-        bytes memory code = abi.encodePacked(type(Proxy).creationCode, uint256(walletImplementation));
-        bytes32 hash = keccak256(abi.encodePacked(bytes1(0xff), address(this), newsalt, keccak256(code)));
+        bytes memory code = abi.encodePacked(
+            type(Proxy).creationCode,
+            uint256(walletImplementation)
+        );
+        bytes32 hash = keccak256(
+            abi.encodePacked(
+                bytes1(0xff),
+                address(this),
+                newsalt,
+                keccak256(code)
+            )
+        );
         _wallet = address(uint160(uint256(hash)));
     }
 
@@ -353,11 +371,17 @@ contract WalletFactory is Owned, Managed {
      * @param _modules The list of modules.
      * @param _guardian The guardian address.
      */
-    function _newSalt(bytes32 _salt, address _owner, address[] memory _modules, address _guardian) internal pure returns (bytes32) {
+    function _newSalt(
+        bytes32 _salt,
+        address _owner,
+        address[] memory _modules,
+        address _guardian
+    ) internal pure returns (bytes32) {
         if (_guardian == address(0)) {
             return keccak256(abi.encodePacked(_salt, _owner, _modules));
         } else {
-            return keccak256(abi.encodePacked(_salt, _owner, _modules, _guardian));
+            return
+                keccak256(abi.encodePacked(_salt, _owner, _modules, _guardian));
         }
     }
 
@@ -366,10 +390,20 @@ contract WalletFactory is Owned, Managed {
      * @param _owner The owner address.
      * @param _modules The list of modules.
      */
-    function _validateInputs(address _owner, address[] memory _modules, string memory _label) internal view {
+    function _validateInputs(
+        address _owner,
+        address[] memory _modules,
+        string memory _label
+    ) internal view {
         require(_owner != address(0), "WF: owner cannot be null");
-        require(_modules.length > 0, "WF: cannot assign with less than 1 module");
-        require(ModuleRegistry(moduleRegistry).isRegisteredModule(_modules), "WF: one or more modules are not registered");
+        require(
+            _modules.length > 0,
+            "WF: cannot assign with less than 1 module"
+        );
+        require(
+            ModuleRegistry(moduleRegistry).isRegisteredModule(_modules),
+            "WF: one or more modules are not registered"
+        );
         bytes memory labelBytes = bytes(_label);
         require(labelBytes.length != 0, "WF: ENS lable must be defined");
     }
@@ -379,11 +413,18 @@ contract WalletFactory is Owned, Managed {
      * @param _wallet The wallet address.
      * @param _label ENS label of the new wallet (e.g. franck).
      */
-    function _registerWalletENS(address payable _wallet, string memory _label) internal {
+    function _registerWalletENS(address payable _wallet, string memory _label)
+        internal
+    {
         // claim reverse
         address ensResolver = IENSManager(ensManager).ensResolver();
-        bytes memory methodData = abi.encodeWithSignature("claimWithResolver(address,address)", ensManager, ensResolver);
-        address ensReverseRegistrar = IENSManager(ensManager).getENSReverseRegistrar();
+        bytes memory methodData = abi.encodeWithSignature(
+            "claimWithResolver(address,address)",
+            ensManager,
+            ensResolver
+        );
+        address ensReverseRegistrar = IENSManager(ensManager)
+            .getENSReverseRegistrar();
         BaseWallet(_wallet).invoke(ensReverseRegistrar, 0, methodData);
         // register with ENS manager
         IENSManager(ensManager).register(_label, _wallet);
