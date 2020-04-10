@@ -11,7 +11,6 @@ import "../storage/IGuardianStorage.sol";
 /**
  * @title WalletFactory
  * @dev The WalletFactory contract creates and assigns wallets to accounts.
- * @author Julien Niset - <julien@argent.xyz>
  */
 contract WalletFactory is Owned, Managed {
     // The address of the module dregistry

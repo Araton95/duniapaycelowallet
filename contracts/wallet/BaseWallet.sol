@@ -5,7 +5,6 @@ import "../interfaces/Module.sol";
 /**
  * @title BaseWallet
  * @dev Simple modular wallet that authorises modules to call its invoke() method.
- * @author Julien Niset - <julien@argent.xyz>
  */
 contract BaseWallet {
     // The implementation of the proxy

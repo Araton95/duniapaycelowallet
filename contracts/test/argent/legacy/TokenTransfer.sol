@@ -10,7 +10,6 @@ import "../../../storage/TransferStorage.sol";
 /**
  * @title LegacyTokenTransfer
  * @dev Legacy Module to transfer tokens (ETH or ERC20) based on a security context (daily limit, whitelist, etc).
- * @author Julien Niset - <julien@argent.im>
  */
 contract LegacyTokenTransfer is BaseModule, RelayerModule, LimitManager {
 

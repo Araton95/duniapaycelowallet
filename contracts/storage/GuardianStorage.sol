@@ -1,38 +1,23 @@
-// Copyright (C) 2018  Argent Labs Ltd. <https://argent.xyz>
+pragma solidity ^0.6.4;
 
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-
-// You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-pragma solidity ^0.5.4;
 import "../wallet/BaseWallet.sol";
 import "./Storage.sol";
 import "./IGuardianStorage.sol";
+
 
 /**
  * @title GuardianStorage
  * @dev Contract storing the state of wallets related to guardians and lock.
  * The contract only defines basic setters and getters with no logic. Only modules authorised
  * for a wallet can modify its state.
- * @author Julien Niset - <julien@argent.im>
- * @author Olivier Van Den Biggelaar - <olivier@argent.im>
+
  */
 contract GuardianStorage is IGuardianStorage, Storage {
-
     struct GuardianStorageConfig {
         // the list of guardians
         address[] guardians;
         // the info about guardians
-        mapping (address => GuardianInfo) info;
+        mapping(address => GuardianInfo) info;
         // the lock's release timestamp
         uint256 lock;
         // the module that set the last lock
@@ -45,7 +30,7 @@ contract GuardianStorage is IGuardianStorage, Storage {
     }
 
     // wallet specific storage
-    mapping (address => GuardianStorageConfig) internal configs;
+    mapping(address => GuardianStorageConfig) internal configs;
 
     // *************** External Functions ********************* //
 
@@ -54,10 +39,15 @@ contract GuardianStorage is IGuardianStorage, Storage {
      * @param _wallet The target wallet.
      * @param _guardian The guardian to add.
      */
-    function addGuardian(BaseWallet _wallet, address _guardian) external onlyModule(_wallet) {
+    function addGuardian(BaseWallet _wallet, address _guardian)
+        external
+        onlyModule(_wallet)
+    {
         GuardianStorageConfig storage config = configs[address(_wallet)];
         config.info[_guardian].exists = true;
-        config.info[_guardian].index = uint128(config.guardians.push(_guardian) - 1);
+        config.info[_guardian].index = uint128(
+            config.guardians.push(_guardian) - 1
+        );
     }
 
     /**
@@ -65,7 +55,10 @@ contract GuardianStorage is IGuardianStorage, Storage {
      * @param _wallet The target wallet.
      * @param _guardian The guardian to revoke.
      */
-    function revokeGuardian(BaseWallet _wallet, address _guardian) external onlyModule(_wallet) {
+    function revokeGuardian(BaseWallet _wallet, address _guardian)
+        external
+        onlyModule(_wallet)
+    {
         GuardianStorageConfig storage config = configs[address(_wallet)];
         address lastGuardian = config.guardians[config.guardians.length - 1];
         if (_guardian != lastGuardian) {
@@ -91,7 +84,11 @@ contract GuardianStorage is IGuardianStorage, Storage {
      * @param _wallet The target wallet.
      * @return the list of guardians.
      */
-    function getGuardians(BaseWallet _wallet) external view returns (address[] memory) {
+    function getGuardians(BaseWallet _wallet)
+        external
+        view
+        returns (address[] memory)
+    {
         GuardianStorageConfig storage config = configs[address(_wallet)];
         address[] memory guardians = new address[](config.guardians.length);
         for (uint256 i = 0; i < config.guardians.length; i++) {
@@ -106,7 +103,11 @@ contract GuardianStorage is IGuardianStorage, Storage {
      * @param _guardian The account.
      * @return true if the account is a guardian for a wallet.
      */
-    function isGuardian(BaseWallet _wallet, address _guardian) external view returns (bool) {
+    function isGuardian(BaseWallet _wallet, address _guardian)
+        external
+        view
+        returns (bool)
+    {
         return configs[address(_wallet)].info[_guardian].exists;
     }
 
@@ -115,9 +116,14 @@ contract GuardianStorage is IGuardianStorage, Storage {
      * @param _wallet The target wallet.
      * @param _releaseAfter The epoch time at which the lock should automatically release.
      */
-    function setLock(BaseWallet _wallet, uint256 _releaseAfter) external onlyModule(_wallet) {
+    function setLock(BaseWallet _wallet, uint256 _releaseAfter)
+        external
+        onlyModule(_wallet)
+    {
         configs[address(_wallet)].lock = _releaseAfter;
-        if (_releaseAfter != 0 && msg.sender != configs[address(_wallet)].locker) {
+        if (
+            _releaseAfter != 0 && msg.sender != configs[address(_wallet)].locker
+        ) {
             configs[address(_wallet)].locker = msg.sender;
         }
     }

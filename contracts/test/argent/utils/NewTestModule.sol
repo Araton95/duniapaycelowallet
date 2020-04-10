@@ -3,13 +3,11 @@ pragma solidity ^0.6.4;
 import "../../../modules/common/BaseModule.sol";
 import "../../../modules/common/RelayerModule.sol";
 import "../../../modules/common/OnlyOwnerModule.sol";
-import "./TestDapp.sol";
 
 
 /**
  * @title NewTestModule
  * @dev Test Module
- * @author Olivier VDB - <olivier@argent.xyz>
  */
 contract NewTestModule is BaseModule, RelayerModule, OnlyOwnerModule {
     bytes32 constant NAME = "NewTestModule";

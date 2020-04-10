@@ -14,8 +14,7 @@ import "./common/RelayerModule.sol";
  * of a wallet and must be confirmed after a security period (e.g. 24 hours).
  * The list of guardians for a wallet is stored on a saparate
  * contract to facilitate its use by other modules.
- * @author Julien Niset - <julien@argent.im>
- * @author Olivier Van Den Biggelaar - <olivier@argent.im>
+
  */
 contract GuardianManager is BaseModule, RelayerModule {
     bytes32 constant NAME = "GuardianManager";

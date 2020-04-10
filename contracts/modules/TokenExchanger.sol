@@ -12,7 +12,6 @@ import "../exchange/KyberNetwork.sol";
 /**
  * @title TokenExchanger
  * @dev Module to trade tokens (ETH or ERC20) using KyberNetworks.
- * @author Julien Niset - <julien@argent.im>
  */
 contract TokenExchanger is BaseModule, RelayerModule, OnlyOwnerModule {
     bytes32 constant NAME = "TokenExchanger";
@@ -24,9 +23,9 @@ contract TokenExchanger is BaseModule, RelayerModule, OnlyOwnerModule {
 
     // The address of the KyberNetwork proxy contract
     address public kyber;
-    // The address of the contract collecting fees for Argent.
+    // The address of the contract collecting fees for DuniPay.
     address public feeCollector;
-    // The Argent fee in 1-per-10000.
+    // The DuniPay fee in 1-per-10000.
     uint256 public feeRatio;
 
     event TokenExchanged(
@@ -139,7 +138,7 @@ contract TokenExchanger is BaseModule, RelayerModule, OnlyOwnerModule {
      * @param _srcToken The address of the source token.
      * @param _destToken The address of the destination token.
      * @param _srcAmount The amount of source token to trade.
-     * @return the amount of destination tokens to be received and the amount of ETH paid to Argent as fee.
+     * @return the amount of destination tokens to be received and the amount of ETH paid to DuniaPay as fee.
      */
     function getExpectedTrade(
         address _srcToken,
@@ -177,9 +176,9 @@ contract TokenExchanger is BaseModule, RelayerModule, OnlyOwnerModule {
     }
 
     /**
-     * @dev Computes the Argent fee based on the amount of source tokens in ETH.
+     * @dev Computes the DuniaPay fee based on the amount of source tokens in ETH.
      * @param _srcAmount The amount of source token to trade in ETH.
-     * @return the fee paid to Argent.
+     * @return the fee paid to DuniaPay.
      */
     function computeFee(uint256 _srcAmount)
         internal

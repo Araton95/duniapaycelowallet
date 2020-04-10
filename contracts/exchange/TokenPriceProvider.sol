@@ -50,7 +50,7 @@ contract TokenPriceProvider is Managed {
     }
 
     //
-    // The following is added to be backward-compatible with Argent's old backend
+    // The following is added to be backward-compatible with DuniPay's old backend
     //
 
     function setKyberNetwork(KyberNetwork _kyberNetwork) external onlyManager {

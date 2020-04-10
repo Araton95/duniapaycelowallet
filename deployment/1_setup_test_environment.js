@@ -28,7 +28,7 @@ async function deployENSRegistry(deployer, owner, domain) {
 	const setSubnodeOwnerXYZ = await ENSWrapper.contract.setSubnodeOwner(BYTES32_NULL, utils.sha3(extension), owner);
 	await ENSWrapper.verboseWaitForTransaction(setSubnodeOwnerXYZ, `Setting Subnode Owner for ${extension}`);
 
-	// Create the 'argentx.xyz' wallet ENS namespace
+	// Create the 'duniapay.me' wallet ENS namespace
 	const setSubnodeOwnerArgent = await ENSWrapper.contract.setSubnodeOwner(utils.namehash(extension), utils.sha3(domainName), owner);
 	await ENSWrapper.verboseWaitForTransaction(setSubnodeOwnerArgent, `Setting Subnode Owner for ${domainName}.${extension}`);
 

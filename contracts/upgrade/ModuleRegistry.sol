@@ -1,33 +1,17 @@
-// Copyright (C) 2018  Argent Labs Ltd. <https://argent.xyz>
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-
-// You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-pragma solidity ^0.5.4;
+pragma solidity ^0.6.4;
 import "../interfaces/Module.sol";
 import "../base/Owned.sol";
 import "../exchange/ERC20.sol";
+
 
 /**
  * @title ModuleRegistry
  * @dev Registry of authorised modules.
  * Modules must be registered before they can be authorised on a wallet.
- * @author Julien Niset - <julien@argent.im>
  */
 contract ModuleRegistry is Owned {
-
-    mapping (address => Info) internal modules;
-    mapping (address => Info) internal upgraders;
+    mapping(address => Info) internal modules;
+    mapping(address => Info) internal upgraders;
 
     event ModuleRegistered(address indexed module, bytes32 name);
     event ModuleDeRegistered(address module);
@@ -60,12 +44,15 @@ contract ModuleRegistry is Owned {
         emit ModuleDeRegistered(_module);
     }
 
-        /**
+    /**
      * @dev Registers an upgrader.
      * @param _upgrader The upgrader.
      * @param _name The unique name of the upgrader.
      */
-    function registerUpgrader(address _upgrader, bytes32 _name) external onlyOwner {
+    function registerUpgrader(address _upgrader, bytes32 _name)
+        external
+        onlyOwner
+    {
         require(!upgraders[_upgrader].exists, "MR: upgrader already exists");
         upgraders[_upgrader] = Info({exists: true, name: _name});
         emit UpgraderRegistered(_upgrader, _name);
@@ -82,12 +69,12 @@ contract ModuleRegistry is Owned {
     }
 
     /**
-    * @dev Utility method enbaling the owner of the registry to claim any ERC20 token that was sent to the
-    * registry.
-    * @param _token The token to recover.
-    */
+     * @dev Utility method enbaling the owner of the registry to claim any ERC20 token that was sent to the
+     * registry.
+     * @param _token The token to recover.
+     */
     function recoverToken(address _token) external onlyOwner {
-        uint total = ERC20(_token).balanceOf(address(this));
+        uint256 total = ERC20(_token).balanceOf(address(this));
         ERC20(_token).transfer(msg.sender, total);
     }
 
@@ -123,8 +110,12 @@ contract ModuleRegistry is Owned {
      * @param _modules The list of modules address.
      * @return true if all the modules are registered.
      */
-    function isRegisteredModule(address[] calldata _modules) external view returns (bool) {
-        for (uint i = 0; i < _modules.length; i++) {
+    function isRegisteredModule(address[] calldata _modules)
+        external
+        view
+        returns (bool)
+    {
+        for (uint256 i = 0; i < _modules.length; i++) {
             if (!modules[_modules[i]].exists) {
                 return false;
             }
@@ -137,7 +128,11 @@ contract ModuleRegistry is Owned {
      * @param _upgrader The upgrader address.
      * @return true if the upgrader is registered.
      */
-    function isRegisteredUpgrader(address _upgrader) external view returns (bool) {
+    function isRegisteredUpgrader(address _upgrader)
+        external
+        view
+        returns (bool)
+    {
         return upgraders[_upgrader].exists;
     }
 }

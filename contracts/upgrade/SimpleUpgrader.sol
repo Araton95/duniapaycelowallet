@@ -1,29 +1,13 @@
-// Copyright (C) 2018  Argent Labs Ltd. <https://argent.xyz>
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-
-// You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-pragma solidity ^0.5.4;
+pragma solidity ^0.6.4;
 
 import "../modules/common/BaseModule.sol";
+
 
 /**
  * @title SimpleUpgrader
  * @dev Temporary module used to add/remove other modules.
- * @author Olivier VDB - <olivier@argent.xyz>, Julien Niset - <julien@argent.im>
  */
 contract SimpleUpgrader is BaseModule {
-
     bytes32 constant NAME = "SimpleUpgrader";
     address[] public toDisable;
     address[] public toEnable;
@@ -34,10 +18,7 @@ contract SimpleUpgrader is BaseModule {
         ModuleRegistry _registry,
         address[] memory _toDisable,
         address[] memory _toEnable
-    )
-        BaseModule(_registry, GuardianStorage(0), NAME)
-        public
-    {
+    ) public BaseModule(_registry, GuardianStorage(0), NAME) {
         toDisable = _toDisable;
         toEnable = _toEnable;
     }
