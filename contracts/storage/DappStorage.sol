@@ -7,7 +7,7 @@ import "./Storage.sol";
  * @title DappStorage
  * @dev Contract storing the state of wallets related to authorised dapps.
  * The contract only defines basic setters and getters with no logic. Only modules authorised
- * for a wallet can modify its state.
+ * for a wallet can modify its state. update registery
  */
 contract DappStorage is Storage {
     // [wallet][dappkey][contract][signature][bool]
