@@ -1,0 +1,11 @@
+framework module country_list_pick {
+  umbrella header "country_list_pick-umbrella.h"
+
+  export *
+  module * { export * }
+}
+
+module country_list_pick.Swift {
+    header "country_list_pick-Swift.h"
+    requires objc
+}

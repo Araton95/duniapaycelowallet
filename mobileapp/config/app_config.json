@@ -1,0 +1,4 @@
+{
+    "incrementAmount": 5,
+    "secretKey": "DEV extremely secret stuff which you cannot put into the source control"
+}
