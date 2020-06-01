@@ -35,9 +35,9 @@ The factory contract produces all the DuniaLink agreements containing the funds 
 ### Future Work
 Multi-Channel Handling
 like a proper payment engine supporting : 
-    * Cash
-    * Cryptocurrencies
-    * Bank deposit
-    * Credit card
-    * Debit card
+- Cash
+- Cryptocurrencies
+- Bank deposit
+- Credit card
+- Debit card
 
